@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JustJPG Einstellungen</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><img src="icons/icon48.png" alt="" width="36" height="36">
+      <div><h1>JustJPG</h1><p class="muted">Jedes Bild mit einem Klick als JPG. Alles wird lokal auf deinem Rechner konvertiert.</p></div>
+    </div>
+    <span id="saved" class="saved" aria-live="polite"></span>
+  </header>
+
+  <main>
+    <section>
+      <h2>Auslöser</h2>
+      <label class="row"><input type="checkbox" data-key="contextMenu">
+        <span><b>Rechtsklick-Menü</b><small>"Als JPG speichern" im Kontextmenü, auch auf Overlays und CSS-Hintergründen.</small></span></label>
+      <label class="row"><input type="checkbox" data-key="unblockContextMenu">
+        <span><b>Rechtsklick-Sperre aufheben</b><small>Seiten, die den Rechtsklick blockieren, können das auf Bildern nicht mehr. Eigene Menüs von Web-Apps bleiben überall sonst erhalten.</small></span></label>
+      <label class="row"><input type="checkbox" data-key="hoverButton">
+        <span><b>Hover-Button am Bild</b><small>Beim Überfahren eines Bildes erscheint ein "JPG"-Button.</small></span></label>
+      <div class="sub" data-show="hoverButton">
+        <label>Position
+          <select data-key="hoverPosition">
+            <option value="top-right">oben rechts</option>
+            <option value="top-left">oben links</option>
+            <option value="bottom-right">unten rechts</option>
+            <option value="bottom-left">unten links</option>
+          </select>
+        </label>
+        <label>Nur bei Bildern ab <input type="number" data-key="hoverMinSize" min="0" max="2000" step="10"> px</label>
+      </div>
+      <div class="row static">
+        <span><b>Tastenkürzel</b><small id="shortcuts">...</small></span>
+        <button id="editShortcuts" type="button">Ändern</button>
+      </div>
+      <div class="row static">
+        <span><b>Alle Bilder der Seite</b><small>Klick auf das JustJPG-Symbol in der Symbolleiste öffnet die Galerie.</small></span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Speichern</h2>
+      <div class="row radio">
+        <label><input type="radio" name="saveMode" value="direct" data-key="saveMode"> <span><b>Direkt speichern</b><small>Ohne Nachfrage in den Download-Ordner.</small></span></label>
+        <label><input type="radio" name="saveMode" value="ask" data-key="saveMode"> <span><b>Jedes Mal fragen</b><small>"Speichern unter"-Dialog öffnen.</small></span></label>
+      </div>
+      <label class="field">Unterordner im Download-Ordner
+        <input type="text" data-key="subfolder" placeholder="leer = direkt in Downloads">
+        <small>Platzhalter erlaubt, z.B. <code>JustJPG/{domain}</code> oder <code>Bilder/{year}-{month}</code></small>
+      </label>
+      <label class="field">Wenn die Datei schon existiert
+        <select data-key="conflictAction">
+          <option value="uniquify">Nummer anhängen (bild (1).jpg)</option>
+          <option value="overwrite">Überschreiben</option>
+        </select>
+      </label>
+      <p class="hint">Hinweis: Ist in Chrome "Vor dem Download von Dateien nach dem Speicherort fragen" aktiv, fragt Chrome trotzdem jedes Mal.</p>
+    </section>
+
+    <section>
+      <h2>Qualität &amp; Konvertierung</h2>
+      <label class="field"><span>JPG-Qualität: <b><output id="qualityOut"></output> %</b></span>
+        <input type="range" data-key="quality" min="50" max="100" step="1">
+      </label>
+      <label class="field inline">Hintergrund für transparente Bereiche
+        <input type="color" data-key="background">
+        <button type="button" class="chip" data-color="#ffffff">Weiß</button>
+        <button type="button" class="chip" data-color="#000000">Schwarz</button>
+      </label>
+      <label class="row"><input type="checkbox" data-key="keepJpeg">
+        <span><b>JPGs unverändert übernehmen</b><small>Ist das Original schon ein JPG, wird es 1:1 gespeichert, ohne erneute Komprimierung.</small></span></label>
+      <label class="row"><input type="checkbox" data-key="preferLargest">
+        <span><b>Größte verfügbare Version holen</b><small>Nutzt die höchste Auflösung aus srcset, verlinkte Vollbilder und Zoom-Varianten.</small></span></label>
+      <label class="row"><input type="checkbox" data-key="screenshotFallback">
+        <span><b>Screenshot als letzte Lösung</b><small>Ist die Originaldatei nicht erreichbar (Schutz, Canvas), wird das Bild abfotografiert. Das hat nur Bildschirmauflösung.</small></span></label>
+    </section>
+
+    <section>
+      <h2>Dateiname</h2>
+      <label class="field">Vorlage
+        <select id="preset"></select>
+      </label>
+      <label class="field">Muster
+        <input type="text" data-key="filenameTemplate" id="template" spellcheck="false">
+      </label>
+      <div class="chips" id="placeholders" aria-label="Platzhalter einfügen"></div>
+      <div class="preview"><span class="muted">Vorschau:</span> <code id="preview"></code></div>
+
+      <label class="row"><input type="checkbox" data-key="crypticFallback">
+        <span><b>Kryptische Namen ersetzen</b><small>Namen wie <code>a8f3c2e91b...</code>, <code>image</code> oder leere Namen werden durch das Ersatzmuster ersetzt.</small></span></label>
+      <label class="field sub" data-show="crypticFallback">Ersatzmuster
+        <input type="text" data-key="fallbackTemplate" spellcheck="false">
+      </label>
+      <div class="grid2">
+        <label class="field">Leerzeichen ersetzen durch
+          <select data-key="spaceReplacement">
+            <option value="_">Unterstrich _</option>
+            <option value="-">Bindestrich -</option>
+            <option value=" ">Leerzeichen behalten</option>
+          </select>
+        </label>
+        <label class="field">Maximale Länge
+          <input type="number" data-key="maxNameLength" min="10" max="200">
+        </label>
+      </div>
+      <label class="row"><input type="checkbox" data-key="lowercase">
+        <span><b>Alles kleinschreiben</b></span></label>
+      <div class="row static">
+        <span><b>Zähler</b><small>Nächste Nummer für <code>{counter}</code>: <span id="counter">1</span></small></span>
+        <button id="resetCounter" type="button">Auf 1 zurücksetzen</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Anzeige</h2>
+      <label class="row"><input type="checkbox" data-key="showToast">
+        <span><b>Bestätigung einblenden</b><small>Kurze Meldung unten rechts nach dem Speichern. Fehler werden immer angezeigt.</small></span></label>
+      <label class="field">Galerie: Mindestgröße (px)
+        <input type="number" data-key="galleryMinSize" min="0" max="2000" step="10">
+      </label>
+    </section>
+
+    <footer class="bottom">
+      <button id="reset" type="button" class="danger">Alle Einstellungen zurücksetzen</button>
+      <span class="muted">HEIC-Dekodierung: libheif (LGPL-3.0), lokal als WebAssembly.</span>
+    </footer>
+  </main>
+
+  <script src="lib/defaults.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
