@@ -39,6 +39,7 @@ HEIC wird mit [libheif](https://github.com/strukturag/libheif) (via [libheif-js]
 - **Speichern**: direkt oder „Speichern unter“-Dialog; Unterordner mit Platzhaltern (z.B. `JustJPG/{domain}`); bei vorhandener Datei nummerieren oder überschreiben.
 - **Qualität**: JPG-Qualität 50–100 % (Standard 92 %), Hintergrundfarbe für Transparenz (Standard Weiß), vorhandene JPGs 1:1 übernehmen, größte Version bevorzugen, Screenshot-Fallback.
 - **Dateiname**: 10 Vorlagen oder ein eigenes Muster mit den Platzhaltern `{name} {domain} {title} {alt} {date} {time} {year} {month} {day} {timestamp} {counter} {index} {width} {height} {format} {random}`. Kryptische Namen (Hashes, `image`, leer) werden automatisch durch ein Ersatzmuster ersetzt. Außerdem: Leerzeichen-Ersatz, Kleinschreibung, maximale Länge, Zähler zurücksetzen. Die Live-Vorschau zeigt das Ergebnis.
+- **Sprache**: Englisch (Standard), Deutsch, Spanisch, Italienisch, Griechisch oder automatisch nach Browsersprache.
 - **Anzeige**: Bestätigung einblenden, Vorschau- und Mindestgröße in der Galerie. In der Galerie lassen sich Vorschaugröße („Vorschau ▾“) und Mindestgröße („Ab … px ▾“) direkt per Schieberegler ändern und werden gespeichert. Der Mindestgröße-Regler reicht nur so weit, wie es auf der Seite tatsächlich Bilder gibt.
 
 ## Grenzen
@@ -46,6 +47,18 @@ HEIC wird mit [libheif](https://github.com/strukturag/libheif) (via [libheif-js]
 - DRM-geschützte Videos (Netflix & Co.) liefern auch im Screenshot nur ein schwarzes Bild. Das ist technisch so gewollt und lässt sich nicht umgehen.
 - Auf `chrome://`-Seiten und im Chrome Web Store dürfen Erweiterungen grundsätzlich nicht laufen.
 - Ist in Chrome „Vor dem Download nach dem Speicherort fragen“ aktiv, fragt Chrome auch im Modus „Direkt speichern“ nach.
+
+## Sprachen
+
+Englisch ist Standard. In den Einstellungen oben rechts lassen sich außerdem Deutsch, Spanisch, Italienisch, Griechisch oder „Automatisch (Browsersprache)“ wählen. Die Umstellung wirkt sofort überall: Einstellungen, Galerie, Rechtsklick-Menü, Meldungen auf der Seite und Fehlertexte.
+
+**Neue Sprache hinzufügen:** Alle Texte stehen in einer einzigen Datei, `extension/translations.js`.
+
+1. Den kompletten Block `en: { ... },` kopieren und am Ende der Liste einfügen.
+2. `en` durch das Sprachkürzel ersetzen (z.B. `fr`) und `_name` durch den Namen der Sprache („Français“).
+3. Die Texte rechts übersetzen. Schlüssel links und alles in `{geschweiften Klammern}` unverändert lassen.
+
+Fertig, die Sprache erscheint automatisch in der Auswahl. Fehlende Einträge fallen auf Englisch zurück, man kann also auch schrittweise übersetzen. Optional übersetzt `extension/_locales/<kürzel>/messages.json` die vier Texte, die Chrome selbst anzeigt (Beschreibung in der Erweiterungsliste, Symbol-Tooltip vor dem ersten Start, Namen der Tastenkürzel). Diese Texte folgen der Sprache des Browsers, nicht der Einstellung im Addon.
 
 ## Projektstruktur
 
@@ -57,6 +70,9 @@ extension/
   offscreen.*        Lokale Dekodierung + JPG-Kodierung (inkl. HEIC)
   popup.*            Galerie „Alle Bilder der Seite“
   options.*          Einstellungen
+  translations.js    Alle Texte in allen Sprachen
+  lib/i18n.js        Übersetzungs-Logik
   lib/defaults.js    Standardwerte + Dateinamen-Logik
   lib/libheif/       HEIC-Decoder (WebAssembly, LGPL-3.0)
+  _locales/          Texte für Chromes eigene Seiten (optional pro Sprache)
 ```

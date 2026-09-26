@@ -2,6 +2,9 @@
 // the selection as JPG.
 (async () => {
   const { DEFAULTS } = globalThis.JustJPG;
+  const { t } = globalThis.JustJPGi18n;
+  await globalThis.JustJPGi18n.init();
+  globalThis.JustJPGi18n.applyTo(document);
   const $ = (id) => document.getElementById(id);
   const grid = $('grid');
   const empty = $('empty');
@@ -84,7 +87,8 @@
     minSel.disabled = !minMax;
     minSel.value = pxToPos(currentMin());
     $('minMax').textContent = `${minMax} px`;
-    $('minOut').textContent = $('minLabel').textContent = `${currentMin()} px`;
+    $('minOut').textContent = `${currentMin()} px`;
+    $('minLabel').textContent = t('popup.minButton', { px: `${currentMin()} px` });
   }
 
   minSel.oninput = () => {
@@ -106,7 +110,7 @@
       func: () => globalThis.__justjpg?.collectAll(16) ?? null,
     });
   } catch {
-    showEmpty('Auf dieser Seite darf Chrome keine Erweiterungen ausführen (z.B. Chrome Web Store, chrome://-Seiten).');
+    showEmpty(t('popup.restricted'));
     return;
   }
 
@@ -121,19 +125,19 @@
     }
   }
   if (!results.some((r) => Array.isArray(r.result))) {
-    showEmpty('Die Seite ist noch nicht bereit. Bitte einmal neu laden (F5) und erneut öffnen.');
+    showEmpty(t('popup.notReady'));
     return;
   }
 
   function formatOf(desc) {
-    if (desc.kind === 'video') return 'Video';
+    if (desc.kind === 'video') return t('popup.fmt.video');
     if (desc.kind === 'canvas') return 'Canvas';
     if (desc.kind === 'svg') return 'SVG';
     const src = desc.srcs[0] || '';
     if (src.startsWith('data:')) return (/^data:image\/([\w+.-]+)/.exec(src)?.[1] || 'data').replace('+xml', '');
     if (src.startsWith('blob:')) return 'blob';
     const ext = /\.([a-z0-9]{3,4})(?:[?#]|$)/i.exec(src)?.[1]?.toLowerCase();
-    return ext && /^(jpe?g|png|webp|avif|gif|heic|heif|bmp|svg|ico|tiff?|jxl|jfif)$/.test(ext) ? ext : desc.kind === 'bg' ? 'CSS' : 'Bild';
+    return ext && /^(jpe?g|png|webp|avif|gif|heic|heif|bmp|svg|ico|tiff?|jxl|jfif)$/.test(ext) ? ext : desc.kind === 'bg' ? 'CSS' : t('popup.fmt.image');
   }
 
   function render() {
@@ -142,7 +146,8 @@
       const tile = document.createElement('div');
       tile.className = 'tile';
       tile.tabIndex = 0;
-      tile.innerHTML = '<div class="ph"></div><span class="box"></span><button class="one" title="Nur dieses Bild speichern">JPG</button><div class="meta"><span class="fmt"></span><span class="dim"></span></div>';
+      tile.innerHTML = '<div class="ph"></div><span class="box"></span><button class="one">JPG</button><div class="meta"><span class="fmt"></span><span class="dim"></span></div>';
+      tile.querySelector('.one').title = t('popup.saveOne');
       tile.querySelector('.ph').textContent = formatOf(item.desc);
       tile.querySelector('.fmt').textContent = formatOf(item.desc).toUpperCase();
       const dim = tile.querySelector('.dim');
@@ -201,10 +206,10 @@
       if (item.tile.hidden && selected.delete(item)) item.tile.classList.remove('selected');
     }
     const n = visibleItems().length;
-    $('minInfo').textContent = `${n} von ${items.length} Bildern sichtbar`;
-    $('count').textContent = `${n} ${n === 1 ? 'Bild' : 'Bilder'}`;
+    $('minInfo').textContent = t('popup.visibleOf', { n, total: items.length });
+    $('count').textContent = t('popup.count', { n });
     if (!n) {
-      empty.textContent = items.length ? 'Keine Bilder in dieser Größe. Mindestgröße verkleinern.' : 'Keine Bilder auf dieser Seite gefunden.';
+      empty.textContent = items.length ? t('popup.noneAtSize') : t('popup.none');
       empty.hidden = false;
     } else empty.hidden = true;
     updateButton();
@@ -213,7 +218,7 @@
   function updateButton() {
     const vis = visibleItems();
     saveBtn.disabled = !selected.size;
-    saveBtn.textContent = selected.size ? `${selected.size} ${selected.size === 1 ? 'Bild' : 'Bilder'} als JPG speichern` : 'Bilder auswählen';
+    saveBtn.textContent = selected.size ? t('popup.saveN', { n: selected.size }) : t('popup.select');
     allBox.checked = vis.length > 0 && vis.every((i) => selected.has(i));
     allBox.indeterminate = !allBox.checked && vis.some((i) => selected.has(i));
   }
@@ -232,7 +237,7 @@
     if (msg?.type !== 'batchProgress' || msg.tabId !== tab.id || !running) return;
     const item = running[msg.index];
     item?.tile.classList.add(msg.ok ? 'done' : 'fail');
-    if (item && !msg.ok) item.tile.title = msg.error || 'Fehler';
+    if (item && !msg.ok) item.tile.title = msg.error || t('popup.error');
     progress.firstElementChild.style.width = `${Math.round(((msg.done + msg.failed) / msg.total) * 100)}%`;
   });
 
@@ -249,7 +254,9 @@
       items: list.map((i) => ({ frameId: i.frameId, desc: i.desc })),
     });
     running = null;
-    saveBtn.textContent = res?.failed?.length ? `${res.done} gespeichert, ${res.failed.length} fehlgeschlagen` : `${res?.done ?? 0} gespeichert`;
+    saveBtn.textContent = res?.failed?.length
+      ? t('popup.resultPartial', { done: res.done, failed: res.failed.length })
+      : t('popup.result', { n: res?.done ?? 0 });
     setTimeout(updateButton, 2500);
   }
 

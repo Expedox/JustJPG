@@ -1,139 +1,148 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>JustJPG Einstellungen</title>
+  <title data-i18n="opt.title">JustJPG Settings</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
   <header class="top">
     <div class="brand"><img src="icons/icon48.png" alt="" width="36" height="36">
-      <div><h1>JustJPG</h1><p class="muted">Jedes Bild mit einem Klick als JPG. Alles wird lokal auf deinem Rechner konvertiert.</p></div>
+      <div><h1>JustJPG</h1><p class="muted" data-i18n="opt.tagline"></p></div>
     </div>
-    <span id="saved" class="saved" aria-live="polite"></span>
+    <div class="top-right">
+      <label class="lang">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span class="sr" data-i18n="opt.language"></span>
+        <select data-key="language" id="language"></select>
+      </label>
+      <span id="saved" class="saved" aria-live="polite"></span>
+    </div>
   </header>
 
   <main>
     <section>
-      <h2>Auslöser</h2>
+      <h2 data-i18n="opt.secTriggers"></h2>
       <label class="row"><input type="checkbox" data-key="contextMenu">
-        <span><b>Rechtsklick-Menü</b><small>"Als JPG speichern" im Kontextmenü, auch auf Overlays und CSS-Hintergründen.</small></span></label>
+        <span><b data-i18n="opt.contextMenu"></b><small data-i18n="opt.contextMenuHint"></small></span></label>
       <label class="row"><input type="checkbox" data-key="unblockContextMenu">
-        <span><b>Rechtsklick-Sperre aufheben</b><small>Seiten, die den Rechtsklick blockieren, können das auf Bildern nicht mehr. Eigene Menüs von Web-Apps bleiben überall sonst erhalten.</small></span></label>
+        <span><b data-i18n="opt.unblock"></b><small data-i18n="opt.unblockHint"></small></span></label>
       <label class="row"><input type="checkbox" data-key="hoverButton">
-        <span><b>Hover-Button am Bild</b><small>Beim Überfahren eines Bildes erscheint ein "JPG"-Button.</small></span></label>
+        <span><b data-i18n="opt.hover"></b><small data-i18n="opt.hoverHint"></small></span></label>
       <div class="sub" data-show="hoverButton">
-        <label>Position
+        <label><span data-i18n="opt.position"></span>
           <select data-key="hoverPosition">
-            <option value="top-right">oben rechts</option>
-            <option value="top-left">oben links</option>
-            <option value="bottom-right">unten rechts</option>
-            <option value="bottom-left">unten links</option>
+            <option value="top-right" data-i18n="opt.posTopRight"></option>
+            <option value="top-left" data-i18n="opt.posTopLeft"></option>
+            <option value="bottom-right" data-i18n="opt.posBottomRight"></option>
+            <option value="bottom-left" data-i18n="opt.posBottomLeft"></option>
           </select>
         </label>
-        <label>Nur bei Bildern ab <input type="number" data-key="hoverMinSize" min="0" max="2000" step="10"> px</label>
+        <label><span data-i18n="opt.hoverMin"></span> <input type="number" data-key="hoverMinSize" min="0" max="2000" step="10"> px</label>
       </div>
       <div class="row static">
-        <span><b>Tastenkürzel</b><small id="shortcuts">...</small></span>
-        <button id="editShortcuts" type="button">Ändern</button>
+        <span><b data-i18n="opt.shortcuts"></b><small id="shortcuts">...</small></span>
+        <button id="editShortcuts" type="button" data-i18n="opt.change"></button>
       </div>
       <div class="row static">
-        <span><b>Alle Bilder der Seite</b><small>Klick auf das JustJPG-Symbol in der Symbolleiste öffnet die Galerie.</small></span>
+        <span><b data-i18n="opt.gallery"></b><small data-i18n="opt.galleryHint"></small></span>
       </div>
     </section>
 
     <section>
-      <h2>Speichern</h2>
+      <h2 data-i18n="opt.secSaving"></h2>
       <div class="row radio">
-        <label><input type="radio" name="saveMode" value="direct" data-key="saveMode"> <span><b>Direkt speichern</b><small>Ohne Nachfrage in den Download-Ordner.</small></span></label>
-        <label><input type="radio" name="saveMode" value="ask" data-key="saveMode"> <span><b>Jedes Mal fragen</b><small>"Speichern unter"-Dialog öffnen.</small></span></label>
+        <label><input type="radio" name="saveMode" value="direct" data-key="saveMode"> <span><b data-i18n="opt.direct"></b><small data-i18n="opt.directHint"></small></span></label>
+        <label><input type="radio" name="saveMode" value="ask" data-key="saveMode"> <span><b data-i18n="opt.ask"></b><small data-i18n="opt.askHint"></small></span></label>
       </div>
-      <label class="field">Unterordner im Download-Ordner
-        <input type="text" data-key="subfolder" placeholder="leer = direkt in Downloads">
-        <small>Platzhalter erlaubt, z.B. <code>JustJPG/{domain}</code> oder <code>Bilder/{year}-{month}</code></small>
+      <label class="field"><span data-i18n="opt.subfolder"></span>
+        <input type="text" data-key="subfolder" data-i18n-placeholder="opt.subfolderPlaceholder">
+        <small data-i18n-html="opt.subfolderHint"></small>
       </label>
-      <label class="field">Wenn die Datei schon existiert
+      <label class="field"><span data-i18n="opt.conflict"></span>
         <select data-key="conflictAction">
-          <option value="uniquify">Nummer anhängen (bild (1).jpg)</option>
-          <option value="overwrite">Überschreiben</option>
+          <option value="uniquify" data-i18n="opt.conflictUniquify"></option>
+          <option value="overwrite" data-i18n="opt.conflictOverwrite"></option>
         </select>
       </label>
-      <p class="hint">Hinweis: Ist in Chrome "Vor dem Download von Dateien nach dem Speicherort fragen" aktiv, fragt Chrome trotzdem jedes Mal.</p>
+      <p class="hint" data-i18n="opt.chromeAskHint"></p>
     </section>
 
     <section>
-      <h2>Qualität &amp; Konvertierung</h2>
-      <label class="field"><span>JPG-Qualität: <b><output id="qualityOut"></output> %</b></span>
+      <h2 data-i18n="opt.secQuality"></h2>
+      <label class="field"><span><span data-i18n="opt.quality"></span> <b><output id="qualityOut"></output> %</b></span>
         <input type="range" data-key="quality" min="50" max="100" step="1">
       </label>
-      <label class="field inline">Hintergrund für transparente Bereiche
+      <label class="field inline"><span data-i18n="opt.background"></span>
         <input type="color" data-key="background">
-        <button type="button" class="chip" data-color="#ffffff">Weiß</button>
-        <button type="button" class="chip" data-color="#000000">Schwarz</button>
+        <button type="button" class="chip" data-color="#ffffff" data-i18n="opt.white"></button>
+        <button type="button" class="chip" data-color="#000000" data-i18n="opt.black"></button>
       </label>
       <label class="row"><input type="checkbox" data-key="keepJpeg">
-        <span><b>JPGs unverändert übernehmen</b><small>Ist das Original schon ein JPG, wird es 1:1 gespeichert, ohne erneute Komprimierung.</small></span></label>
+        <span><b data-i18n="opt.keepJpeg"></b><small data-i18n="opt.keepJpegHint"></small></span></label>
       <label class="row"><input type="checkbox" data-key="preferLargest">
-        <span><b>Größte verfügbare Version holen</b><small>Nutzt die höchste Auflösung aus srcset, verlinkte Vollbilder und Zoom-Varianten.</small></span></label>
+        <span><b data-i18n="opt.largest"></b><small data-i18n="opt.largestHint"></small></span></label>
       <label class="row"><input type="checkbox" data-key="screenshotFallback">
-        <span><b>Screenshot als letzte Lösung</b><small>Ist die Originaldatei nicht erreichbar (Schutz, Canvas), wird das Bild abfotografiert. Das hat nur Bildschirmauflösung.</small></span></label>
+        <span><b data-i18n="opt.screenshot"></b><small data-i18n="opt.screenshotHint"></small></span></label>
     </section>
 
     <section>
-      <h2>Dateiname</h2>
-      <label class="field">Vorlage
+      <h2 data-i18n="opt.secFilename"></h2>
+      <label class="field"><span data-i18n="opt.template"></span>
         <select id="preset"></select>
       </label>
-      <label class="field">Muster
+      <label class="field"><span data-i18n="opt.pattern"></span>
         <input type="text" data-key="filenameTemplate" id="template" spellcheck="false">
       </label>
-      <div class="chips" id="placeholders" aria-label="Platzhalter einfügen"></div>
-      <div class="preview"><span class="muted">Vorschau:</span> <code id="preview"></code></div>
+      <div class="chips" id="placeholders" data-i18n-aria-label="opt.insertPlaceholder"></div>
+      <div class="preview"><span class="muted" data-i18n="opt.preview"></span> <code id="preview"></code></div>
 
       <label class="row"><input type="checkbox" data-key="crypticFallback">
-        <span><b>Kryptische Namen ersetzen</b><small>Namen wie <code>a8f3c2e91b...</code>, <code>image</code> oder leere Namen werden durch das Ersatzmuster ersetzt.</small></span></label>
-      <label class="field sub" data-show="crypticFallback">Ersatzmuster
+        <span><b data-i18n="opt.cryptic"></b><small data-i18n-html="opt.crypticHint"></small></span></label>
+      <label class="field sub" data-show="crypticFallback"><span data-i18n="opt.fallback"></span>
         <input type="text" data-key="fallbackTemplate" spellcheck="false">
       </label>
       <div class="grid2">
-        <label class="field">Leerzeichen ersetzen durch
+        <label class="field"><span data-i18n="opt.spaces"></span>
           <select data-key="spaceReplacement">
-            <option value="_">Unterstrich _</option>
-            <option value="-">Bindestrich -</option>
-            <option value=" ">Leerzeichen behalten</option>
+            <option value="_" data-i18n="opt.spaceUnderscore"></option>
+            <option value="-" data-i18n="opt.spaceDash"></option>
+            <option value=" " data-i18n="opt.spaceKeep"></option>
           </select>
         </label>
-        <label class="field">Maximale Länge
+        <label class="field"><span data-i18n="opt.maxLength"></span>
           <input type="number" data-key="maxNameLength" min="10" max="200">
         </label>
       </div>
       <label class="row"><input type="checkbox" data-key="lowercase">
-        <span><b>Alles kleinschreiben</b></span></label>
+        <span><b data-i18n="opt.lowercase"></b></span></label>
       <div class="row static">
-        <span><b>Zähler</b><small>Nächste Nummer für <code>{counter}</code>: <span id="counter">1</span></small></span>
-        <button id="resetCounter" type="button">Auf 1 zurücksetzen</button>
+        <span><b data-i18n="opt.counter"></b><small><span data-i18n-html="opt.counterHint"></span> <span id="counter">1</span></small></span>
+        <button id="resetCounter" type="button" data-i18n="opt.resetCounter"></button>
       </div>
     </section>
 
     <section>
-      <h2>Anzeige</h2>
+      <h2 data-i18n="opt.secDisplay"></h2>
       <label class="row"><input type="checkbox" data-key="showToast">
-        <span><b>Bestätigung einblenden</b><small>Kurze Meldung unten rechts nach dem Speichern. Fehler werden immer angezeigt.</small></span></label>
-      <label class="field">Galerie: Vorschaugröße (px)
+        <span><b data-i18n="opt.toast"></b><small data-i18n="opt.toastHint"></small></span></label>
+      <label class="field"><span data-i18n="opt.thumbSize"></span>
         <input type="number" data-key="galleryThumbSize" min="70" max="260" step="10">
       </label>
-      <label class="field">Galerie: Mindestgröße (px)
+      <label class="field"><span data-i18n="opt.galleryMin"></span>
         <input type="number" data-key="galleryMinSize" min="0" max="2000" step="10">
       </label>
     </section>
 
     <footer class="bottom">
-      <button id="reset" type="button" class="danger">Alle Einstellungen zurücksetzen</button>
-      <span class="muted">HEIC-Dekodierung: libheif (LGPL-3.0), lokal als WebAssembly.</span>
+      <button id="reset" type="button" class="danger" data-i18n="opt.resetAll"></button>
+      <span class="muted" data-i18n="opt.heicNote"></span>
     </footer>
   </main>
 
+  <script src="translations.js"></script>
+  <script src="lib/i18n.js"></script>
   <script src="lib/defaults.js"></script>
   <script src="options.js"></script>
 </body>

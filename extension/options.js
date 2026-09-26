@@ -1,15 +1,34 @@
 (async () => {
   const { DEFAULTS, PRESETS, PLACEHOLDERS, buildFilename } = globalThis.JustJPG;
+  const i18n = globalThis.JustJPGi18n;
+  const { t } = i18n;
   const $ = (id) => document.getElementById(id);
+  await i18n.init();
   let settings = { ...DEFAULTS, ...(await chrome.storage.sync.get(DEFAULTS)) };
 
   const inputs = [...document.querySelectorAll('[data-key]')];
   const template = $('template');
   const preset = $('preset');
 
+  // ---------------------------------------------------------------- language
+  const language = $('language');
+  language.add(new Option(t('opt.languageAuto'), 'auto'));
+  for (const { code, name } of i18n.languages()) language.add(new Option(name, code));
+
+  // Texts that are built in JS; re-run whenever the language changes.
+  function renderTexts() {
+    i18n.applyTo(document);
+    language.options[0].text = t('opt.languageAuto');
+    preset.textContent = '';
+    for (const p of PRESETS) preset.add(new Option(`${t('preset.' + p.id)}  -  ${p.template}`, p.id));
+    preset.add(new Option(t('opt.customTemplate'), 'custom'));
+    for (const chip of $('placeholders').children) chip.title = t('ph.' + chip.dataset.ph);
+    renderShortcuts();
+    refresh();
+  }
+  i18n.onChange(renderTexts);
+
   // ---------------------------------------------------------------- presets + placeholders
-  for (const p of PRESETS) preset.add(new Option(`${p.label}  -  ${p.template}`, p.id));
-  preset.add(new Option('Eigenes Muster', 'custom'));
   preset.onchange = () => {
     const p = PRESETS.find((x) => x.id === preset.value);
     if (!p) return template.focus();
@@ -17,12 +36,13 @@
     save('filenameTemplate', p.template);
   };
 
-  for (const [ph, label] of Object.entries(PLACEHOLDERS)) {
+  for (const name of PLACEHOLDERS) {
+    const ph = `{${name}}`;
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'chip';
     b.textContent = ph;
-    b.title = label;
+    b.dataset.ph = name;
     b.onclick = () => {
       const { selectionStart: s = template.value.length, selectionEnd: e = s } = template;
       template.setRangeText(ph, s, e, 'end');
@@ -59,7 +79,7 @@
     settings[key] = value;
     await chrome.storage.sync.set({ [key]: value });
     refresh();
-    $('saved').textContent = 'Gespeichert';
+    $('saved').textContent = t('opt.saved');
     clearTimeout(savedTimer);
     savedTimer = setTimeout(() => ($('saved').textContent = ''), 1500);
   }
@@ -86,10 +106,10 @@
     const match = PRESETS.find((p) => p.template === settings.filenameTemplate);
     preset.value = match ? match.id : 'custom';
     const sample = {
-      srcUrl: 'https://cdn.example.com/media/sonnenuntergang-am-meer.webp',
-      pageUrl: 'https://www.example.com/galerie',
-      pageTitle: 'Urlaub 2026 - Galerie',
-      alt: 'Sonnenuntergang am Meer',
+      srcUrl: `https://cdn.example.com/media/${t('opt.sampleFile')}.webp`,
+      pageUrl: 'https://www.example.com/gallery',
+      pageTitle: t('opt.sampleTitle'),
+      alt: t('opt.sampleAlt'),
       width: 1920,
       height: 1080,
       format: 'webp',
@@ -113,21 +133,24 @@
 
   // ---------------------------------------------------------------- shortcuts
   const commands = await chrome.commands.getAll();
-  const labels = { 'save-under-cursor': 'Bild unter Mauszeiger', 'save-visible': 'Sichtbarer Bereich' };
-  $('shortcuts').textContent =
-    commands
-      .filter((c) => labels[c.name])
-      .map((c) => `${labels[c.name]}: ${c.shortcut || 'nicht belegt'}`)
-      .join('  |  ') || 'nicht belegt';
+  function renderShortcuts() {
+    const labels = { 'save-under-cursor': 'opt.shortcutCursor', 'save-visible': 'opt.shortcutVisible' };
+    $('shortcuts').textContent =
+      commands
+        .filter((c) => labels[c.name])
+        .map((c) => `${t(labels[c.name])}: ${c.shortcut || t('opt.shortcutNone')}`)
+        .join('  |  ') || t('opt.shortcutNone');
+  }
   $('editShortcuts').onclick = () => chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
 
   // ---------------------------------------------------------------- reset
   $('reset').onclick = async () => {
-    if (!confirm('Alle Einstellungen auf Standard zurücksetzen?')) return;
+    if (!confirm(t('opt.resetConfirm'))) return;
     await chrome.storage.sync.clear();
     settings = { ...DEFAULTS };
     fill();
   };
 
+  renderTexts();
   fill();
 })();

@@ -1,0 +1,14 @@
+{
+  "extDescription": {
+    "message": "Guarda cualquier imagen como JPG con un clic. WEBP, AVIF, HEIC, PNG, SVG, vídeos y canvas se convierten localmente."
+  },
+  "actionTitle": {
+    "message": "JustJPG: Todas las imágenes de esta página"
+  },
+  "cmdSaveUnderCursor": {
+    "message": "Guardar como JPG la imagen bajo el puntero"
+  },
+  "cmdSaveVisible": {
+    "message": "Guardar como JPG el área visible de la página"
+  }
+}

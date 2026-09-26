@@ -3,6 +3,7 @@
 // so it only writes to globalThis and has no exports.
 (() => {
   const DEFAULTS = {
+    language: 'en', // 'auto' or a code from translations.js
     // Trigger
     contextMenu: true,
     hoverButton: true,
@@ -36,37 +37,21 @@
     galleryThumbSize: 130,
   };
 
+  // Labels live in translations.js as 'preset.<id>' and 'ph.<name>'.
   const PRESETS = [
-    { id: 'original', label: 'Originalname', template: '{name}' },
-    { id: 'domain-time', label: 'Seite + Datum + Uhrzeit', template: '{domain}_{date}_{time}' },
-    { id: 'title', label: 'Seitentitel', template: '{title}' },
-    { id: 'title-index', label: 'Seitentitel + Nummer', template: '{title}_{index}' },
-    { id: 'alt', label: 'Bildbeschreibung (alt-Text)', template: '{alt}' },
-    { id: 'domain-name', label: 'Seite + Originalname', template: '{domain}_{name}' },
-    { id: 'date-name', label: 'Datum + Originalname', template: '{date}_{name}' },
-    { id: 'counter', label: 'Fortlaufende Nummer', template: 'JustJPG_{counter}' },
-    { id: 'size', label: 'Originalname + Auflösung', template: '{name}_{width}x{height}' },
-    { id: 'timestamp', label: 'Zeitstempel (Unix)', template: '{timestamp}' },
+    { id: 'original', template: '{name}' },
+    { id: 'domain-time', template: '{domain}_{date}_{time}' },
+    { id: 'title', template: '{title}' },
+    { id: 'title-index', template: '{title}_{index}' },
+    { id: 'alt', template: '{alt}' },
+    { id: 'domain-name', template: '{domain}_{name}' },
+    { id: 'date-name', template: '{date}_{name}' },
+    { id: 'counter', template: 'JustJPG_{counter}' },
+    { id: 'size', template: '{name}_{width}x{height}' },
+    { id: 'timestamp', template: '{timestamp}' },
   ];
 
-  const PLACEHOLDERS = {
-    '{name}': 'Originaler Dateiname ohne Endung',
-    '{domain}': 'Domain der Seite (z.B. instagram.com)',
-    '{title}': 'Titel der Seite',
-    '{alt}': 'Bildbeschreibung (alt/title-Text)',
-    '{date}': 'Datum JJJJ-MM-TT',
-    '{time}': 'Uhrzeit HH-MM-SS',
-    '{year}': 'Jahr',
-    '{month}': 'Monat',
-    '{day}': 'Tag',
-    '{timestamp}': 'Unix-Zeitstempel (ms)',
-    '{counter}': 'Fortlaufende Nummer (bleibt gespeichert)',
-    '{index}': 'Nummer innerhalb einer Sammel-Speicherung',
-    '{width}': 'Breite in Pixel',
-    '{height}': 'Höhe in Pixel',
-    '{format}': 'Ursprungsformat (webp, heic, png ...)',
-    '{random}': 'Zufällige 6 Zeichen',
-  };
+  const PLACEHOLDERS = ['name', 'domain', 'title', 'alt', 'date', 'time', 'year', 'month', 'day', 'timestamp', 'counter', 'index', 'width', 'height', 'format', 'random'];
 
   const GENERIC_NAMES = new Set([
     'image', 'img', 'images', 'photo', 'picture', 'pic', 'download', 'file', 'index',
@@ -113,7 +98,7 @@
     try {
       return new URL(url).hostname.replace(/^www\./, '');
     } catch {
-      return 'seite';
+      return 'page';
     }
   }
 

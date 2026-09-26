@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>JustJPG</title>
@@ -9,34 +9,34 @@
   <header>
     <div class="brand"><img src="icons/icon32.png" alt="" width="20" height="20"><strong>JustJPG</strong><span id="count" class="muted"></span></div>
     <div class="actions">
-      <button id="visible" class="ghost" title="Sichtbaren Bereich der Seite als JPG speichern">Screenshot</button>
-      <button id="options" class="ghost icon" title="Einstellungen" aria-label="Einstellungen">
+      <button id="visible" class="ghost" data-i18n-title="popup.screenshotTitle" data-i18n="popup.screenshot"></button>
+      <button id="options" class="ghost icon" data-i18n-title="popup.settings" data-i18n-aria-label="popup.settings">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
       </button>
     </div>
   </header>
 
   <div class="toolbar">
-    <label class="check"><input type="checkbox" id="all"> Alle</label>
+    <label class="check"><input type="checkbox" id="all"> <span data-i18n="popup.all"></span></label>
     <div class="right">
     <div class="view">
-      <button id="viewBtn" type="button" class="ghost" aria-haspopup="true" aria-expanded="false" aria-controls="viewMenu" title="Vorschaugröße einstellen">
+      <button id="viewBtn" type="button" class="ghost" aria-haspopup="true" aria-expanded="false" aria-controls="viewMenu" data-i18n-title="popup.previewTitle">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-        Vorschau <span class="caret">&#9662;</span>
+        <span data-i18n="popup.preview"></span> <span class="caret">&#9662;</span>
       </button>
-      <div id="viewMenu" class="menu" role="dialog" aria-label="Vorschaugröße" hidden>
-        <label for="thumb">Vorschaugröße <output id="thumbOut"></output></label>
+      <div id="viewMenu" class="menu" role="dialog" data-i18n-aria-label="popup.previewSize" hidden>
+        <label for="thumb"><span data-i18n="popup.previewSize"></span> <output id="thumbOut"></output></label>
         <input type="range" id="thumb" min="70" max="260" step="10">
-        <div class="scale"><span>klein</span><span>groß</span></div>
+        <div class="scale"><span data-i18n="popup.small"></span><span data-i18n="popup.large"></span></div>
       </div>
     </div>
     <div class="view">
-      <button id="minBtn" type="button" class="ghost" aria-haspopup="true" aria-expanded="false" aria-controls="minMenu" title="Kleine Bilder ausblenden">
+      <button id="minBtn" type="button" class="ghost" aria-haspopup="true" aria-expanded="false" aria-controls="minMenu" data-i18n-title="popup.minTitle">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>
-        Ab <span id="minLabel"></span> <span class="caret">&#9662;</span>
+        <span id="minLabel"></span> <span class="caret">&#9662;</span>
       </button>
-      <div id="minMenu" class="menu" role="dialog" aria-label="Mindestgröße" hidden>
-        <label for="min">Mindestgröße <output id="minOut"></output></label>
+      <div id="minMenu" class="menu" role="dialog" data-i18n-aria-label="popup.minSize" hidden>
+        <label for="min"><span data-i18n="popup.minSize"></span> <output id="minOut"></output></label>
         <input type="range" id="min" min="0" max="1000" step="1">
         <div class="scale"><span>0 px</span><span id="minMax"></span></div>
         <p class="info" id="minInfo"></p>
@@ -50,9 +50,11 @@
 
   <footer>
     <div id="progress" class="progress" hidden><div></div></div>
-    <button id="save" class="primary" disabled>Als JPG speichern</button>
+    <button id="save" class="primary" disabled data-i18n="popup.select"></button>
   </footer>
 
+  <script src="translations.js"></script>
+  <script src="lib/i18n.js"></script>
   <script src="lib/defaults.js"></script>
   <script src="popup.js"></script>
 </body>

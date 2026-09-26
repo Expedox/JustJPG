@@ -1,0 +1,14 @@
+{
+  "extDescription": {
+    "message": "Saves any image as JPG with one click. WEBP, AVIF, HEIC, PNG, SVG, videos and canvas are converted locally."
+  },
+  "actionTitle": {
+    "message": "JustJPG: All images on this page"
+  },
+  "cmdSaveUnderCursor": {
+    "message": "Save the image under the mouse pointer as JPG"
+  },
+  "cmdSaveVisible": {
+    "message": "Save the visible area of the page as JPG"
+  }
+}

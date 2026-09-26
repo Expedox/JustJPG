@@ -5,6 +5,9 @@
   if (globalThis.__justjpg) return;
 
   const { DEFAULTS } = globalThis.JustJPG;
+  const i18n = globalThis.JustJPGi18n;
+  const { t } = i18n;
+  i18n.init();
   let settings = { ...DEFAULTS };
   const IS_TOP = window === window.top;
   const IMG_EXT = /\.(jpe?g|jfif|png|webp|avif|gif|heic|heif|bmp|tiff?|jxl|svg|ico)(?:[?#]|$)/i;
@@ -365,7 +368,7 @@
       const id = Math.random().toString(36).slice(2);
       pendingRects.set(id, resolve);
       setTimeout(() => {
-        if (pendingRects.delete(id)) reject(new Error('Frame-Position unbekannt'));
+        if (pendingRects.delete(id)) reject(new Error(t('err.frameUnknown')));
       }, 3000);
       window.parent.postMessage({ __justjpg: 'rect', id, rect }, '*');
     });
@@ -418,7 +421,7 @@
     }
     r = el.getBoundingClientRect();
     const rect = clipRect(r, { left: 0, top: 0, right: innerWidth, bottom: innerHeight });
-    if (rect.right - rect.left < 2 || rect.bottom - rect.top < 2) throw new Error('Element nicht sichtbar');
+    if (rect.right - rect.left < 2 || rect.bottom - rect.top < 2) throw new Error(t('err.notVisible'));
     return toTopRect(rect);
   }
 
@@ -499,8 +502,10 @@
       button.ok{background:#2b8a3e}
       button.err{background:#c92a2a}
       svg{flex:none}
-    </style><button type="button" title="Als JPG speichern (JustJPG)">${ICON_SAVE}<span>JPG</span></button>`;
+    </style><button type="button">${ICON_SAVE}<span>JPG</span></button>`;
     hoverBtn = shadow.querySelector('button');
+    hoverBtn.title = t('hover.title');
+    i18n.onChange(() => (hoverBtn.title = t('hover.title')));
     const swallow = (e) => {
       e.stopPropagation();
       e.stopImmediatePropagation();
@@ -523,10 +528,10 @@
       try {
         const res = await chrome.runtime.sendMessage({ type: 'saveDescriptor', desc: describe(el, kind) });
         hoverBtn.className = res?.ok ? 'ok' : 'err';
-        label.textContent = res?.ok ? 'OK' : 'Fehler';
+        label.textContent = res?.ok ? t('hover.ok') : t('hover.error');
       } catch {
         hoverBtn.className = 'err';
-        label.textContent = 'Fehler';
+        label.textContent = t('hover.error');
       }
       setTimeout(() => {
         hoverBusy = false;
@@ -674,12 +679,12 @@
         case 'localData': {
           const el = registry.get(msg.token);
           if (msg.url) return pageFetch(msg.url);
-          if (!el) throw new Error('Element nicht mehr vorhanden');
+          if (!el) throw new Error(t('err.elementGone'));
           return localData(el, msg.kind);
         }
         case 'prepareCapture': {
           const el = registry.get(msg.token);
-          if (!el || !el.isConnected) throw new Error('Element nicht mehr vorhanden');
+          if (!el || !el.isConnected) throw new Error(t('err.elementGone'));
           return prepareCapture(el);
         }
         case 'toast':

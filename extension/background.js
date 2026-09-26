@@ -1,8 +1,13 @@
 // JustJPG service worker: context menu, keyboard shortcuts, the save pipeline
 // (original file -> page-context fetch -> screenshot fallback) and downloads.
+import './translations.js';
+import './lib/i18n.js';
 import './lib/defaults.js';
 
 const { DEFAULTS, buildFilename } = globalThis.JustJPG;
+const i18n = globalThis.JustJPGi18n;
+const { t } = i18n;
+const CONTENT_FILES = ['translations.js', 'lib/i18n.js', 'lib/defaults.js', 'content.js'];
 
 const MENU_SAVE = 'justjpg-save';
 const MENU_VISIBLE = 'justjpg-visible';
@@ -16,17 +21,19 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---------------------------------------------------------------- setup
 async function setupMenus() {
+  await i18n.init();
   await chrome.contextMenus.removeAll();
   const s = await getSettings();
+  chrome.action.setTitle({ title: t('action.title') });
   // Action (toolbar icon) menu - always available
-  chrome.contextMenus.create({ id: MENU_VISIBLE, title: 'Sichtbaren Bereich als JPG speichern', contexts: ['action'] });
-  chrome.contextMenus.create({ id: MENU_SHORTCUTS, title: 'Tastenkürzel ändern ...', contexts: ['action'] });
+  chrome.contextMenus.create({ id: MENU_VISIBLE, title: t('menu.visible'), contexts: ['action'] });
+  chrome.contextMenus.create({ id: MENU_SHORTCUTS, title: t('menu.shortcuts'), contexts: ['action'] });
   if (!s.contextMenu) return;
   // A single page item, so Chrome shows it directly instead of in a submenu.
   // 'page' matters: on sites with overlays the click never hits the <img>.
   chrome.contextMenus.create({
     id: MENU_SAVE,
-    title: 'Als JPG speichern',
+    title: t('menu.save'),
     contexts: ['image', 'video', 'page', 'frame', 'link', 'selection', 'editable'],
   });
 }
@@ -37,13 +44,15 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   const tabs = await chrome.tabs.query({ url: ['http://*/*', 'https://*/*', 'file:///*'] });
   for (const tab of tabs) {
     chrome.scripting
-      .executeScript({ target: { tabId: tab.id, allFrames: true }, files: ['lib/defaults.js', 'content.js'] })
+      .executeScript({ target: { tabId: tab.id, allFrames: true }, files: CONTENT_FILES })
       .catch(() => {});
   }
   if (reason === 'install') chrome.runtime.openOptionsPage();
 });
 
 chrome.runtime.onStartup.addListener(setupMenus);
+i18n.onChange(setupMenus);
+i18n.init();
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && 'contextMenu' in changes) setupMenus();
@@ -60,7 +69,7 @@ async function ensureOffscreen() {
     .createDocument({
       url: 'offscreen.html',
       reasons: ['BLOBS', 'DOM_PARSER'],
-      justification: 'Bilder lokal dekodieren und nach JPG konvertieren',
+      justification: 'Decode images locally and convert them to JPG',
     })
     .catch((e) => {
       if (!String(e?.message).includes('single offscreen')) throw e;
@@ -72,10 +81,10 @@ async function ensureOffscreen() {
 async function offscreen(msg) {
   await ensureOffscreen();
   clearTimeout(offscreenIdleTimer);
-  const res = await chrome.runtime.sendMessage({ target: 'offscreen', ...msg });
+  const res = await chrome.runtime.sendMessage({ target: 'offscreen', lang: i18n.lang, ...msg });
   // free the decoder memory when idle
   offscreenIdleTimer = setTimeout(() => chrome.offscreen.closeDocument().catch(() => {}), 60_000);
-  if (!res) throw new Error('Konverter antwortet nicht');
+  if (!res) throw new Error(t('err.converter'));
   if (!res.ok) throw Object.assign(new Error(res.error), { code: res.code });
   return res.value;
 }
@@ -83,7 +92,7 @@ async function offscreen(msg) {
 // ---------------------------------------------------------------- page helpers
 async function frameCall(tabId, frameId, msg) {
   const res = await chrome.tabs.sendMessage(tabId, msg, { frameId });
-  if (!res) throw new Error('Seite antwortet nicht (bitte neu laden)');
+  if (!res) throw new Error(t('err.page'));
   if (!res.ok) throw new Error(res.error);
   return res.value;
 }
@@ -180,9 +189,9 @@ async function convertDescriptor(tab, frameId, desc, s) {
     try {
       const dataUrl = await frameCall(tab.id, frameId, { type: 'localData', token: desc.token, kind: desc.kind });
       if (dataUrl) return { result: await offscreen({ type: 'convert', url: dataUrl, options, hint }), src: '' };
-      errors.push('Inhalt ist leer');
+      errors.push(t('err.contentEmpty'));
     } catch (e) {
-      errors.push(/secur|taint/i.test(e.message) ? 'Inhalt ist geschützt' : e.message);
+      errors.push(/secur|taint/i.test(e.message) ? t('err.contentProtected') : e.message);
     }
   }
 
@@ -213,10 +222,10 @@ async function convertDescriptor(tab, frameId, desc, s) {
     try {
       return { result: await captureElement(tab, frameId, desc, options), src: desc.srcs?.[0] || '', screenshot: true };
     } catch (e) {
-      errors.push(`Screenshot: ${e.message}`);
+      errors.push(t('err.screenshot', { message: e.message }));
     }
   }
-  throw new Error(errors[0] || 'Kein Bild gefunden');
+  throw new Error(errors[0] || t('err.noImage'));
 }
 
 async function download(dataUrl, info, s) {
@@ -253,10 +262,16 @@ async function saveDescriptor(tab, frameId, desc, extra = {}) {
 
 async function saveAndReport(tab, frameId, desc) {
   try {
-    if (!desc) throw new Error('Kein Bild an dieser Stelle gefunden');
+    if (!desc) throw new Error(t('err.noImageHere'));
     const r = await saveDescriptor(tab, frameId, desc);
-    const note = r.screenshot ? ' (per Screenshot)' : r.kept ? ' (Original-JPG)' : r.format ? ` (aus ${r.format.toUpperCase()})` : '';
-    toast(tab.id, `Gespeichert: ${r.filename}${note}`);
+    const note = r.screenshot
+      ? t('toast.viaScreenshot')
+      : r.kept
+        ? t('toast.keptJpeg')
+        : r.format
+          ? t('toast.fromFormat', { format: r.format.toUpperCase() })
+          : '';
+    toast(tab.id, t('toast.saved', { file: r.filename }) + note);
     return { ok: true, ...r };
   } catch (e) {
     toast(tab.id, `JustJPG: ${e.message}`, 'err');
@@ -272,7 +287,7 @@ async function saveVisible(tab) {
     setUiHidden(tab.id, false);
     const result = await offscreen({ type: 'convert', url: png, options: { quality: s.quality, background: s.background, keepJpeg: false } });
     const filename = await download(result.dataUrl, { srcUrl: '', pageUrl: tab.url, pageTitle: tab.title, width: result.width, height: result.height, format: 'screenshot' }, s);
-    toast(tab.id, `Gespeichert: ${filename}`);
+    toast(tab.id, t('toast.saved', { file: filename }));
     return { ok: true, filename };
   } catch (e) {
     setUiHidden(tab.id, false);
@@ -299,7 +314,9 @@ async function saveBatch(tabId, items) {
       .sendMessage({ type: 'batchProgress', tabId, index: i, ok: !error, error, done, failed: failed.length, total: items.length })
       .catch(() => {});
   }
-  const text = failed.length ? `${done} von ${items.length} Bildern gespeichert, ${failed.length} fehlgeschlagen` : `${done} Bilder als JPG gespeichert`;
+  const text = failed.length
+    ? t('toast.batchPartial', { done, total: items.length, failed: failed.length })
+    : t('toast.batchDone', { n: done });
   toast(tabId, text, failed.length ? 'info' : 'ok');
   return { ok: true, done, failed };
 }

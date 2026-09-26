@@ -1,0 +1,14 @@
+{
+  "extDescription": {
+    "message": "Speichert jedes Bild mit einem Klick als JPG. WEBP, AVIF, HEIC, PNG, SVG, Videos und Canvas werden lokal konvertiert."
+  },
+  "actionTitle": {
+    "message": "JustJPG: Alle Bilder dieser Seite"
+  },
+  "cmdSaveUnderCursor": {
+    "message": "Bild unter dem Mauszeiger als JPG speichern"
+  },
+  "cmdSaveVisible": {
+    "message": "Sichtbaren Bereich der Seite als JPG speichern"
+  }
+}

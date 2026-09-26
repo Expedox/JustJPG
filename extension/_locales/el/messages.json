@@ -1,0 +1,14 @@
+{
+  "extDescription": {
+    "message": "Αποθηκεύει κάθε εικόνα ως JPG με ένα κλικ. Τα WEBP, AVIF, HEIC, PNG, SVG, βίντεο και canvas μετατρέπονται τοπικά."
+  },
+  "actionTitle": {
+    "message": "JustJPG: Όλες οι εικόνες αυτής της σελίδας"
+  },
+  "cmdSaveUnderCursor": {
+    "message": "Αποθήκευση ως JPG της εικόνας κάτω από τον δείκτη"
+  },
+  "cmdSaveVisible": {
+    "message": "Αποθήκευση ως JPG της ορατής περιοχής της σελίδας"
+  }
+}

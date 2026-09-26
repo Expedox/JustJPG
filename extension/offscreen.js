@@ -2,11 +2,19 @@
 // permissions (no CORS), decodes everything Chrome can decode plus HEIC/HEIF
 // via a bundled libheif WASM build, and encodes to JPEG. Everything stays local.
 
+import './translations.js';
+import './lib/i18n.js';
+
+// Offscreen documents cannot read chrome.storage, so every request carries
+// the current language.
+const { t, use: useLanguage } = globalThis.JustJPGi18n;
+
 const MAX_AREA = 16384 * 16384;
 let libheif = null;
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg?.target !== 'offscreen') return;
+  if (msg.lang) useLanguage(msg.lang);
   const run = msg.type === 'crop' ? crop(msg) : convert(msg);
   run.then(
     (value) => sendResponse({ ok: true, value }),
@@ -28,11 +36,11 @@ async function load(url) {
   try {
     res = await fetch(url, { credentials: 'include', cache: 'force-cache', redirect: 'follow' });
   } catch (e) {
-    throw new ConvertError(`Download fehlgeschlagen (${e.message})`, 'fetch');
+    throw new ConvertError(t('err.download', { message: e.message }), 'fetch');
   }
-  if (!res.ok) throw new ConvertError(`Server antwortet mit HTTP ${res.status}`, 'fetch');
+  if (!res.ok) throw new ConvertError(t('err.http', { status: res.status }), 'fetch');
   const blob = await res.blob();
-  if (!blob.size) throw new ConvertError('Leere Antwort vom Server', 'fetch');
+  if (!blob.size) throw new ConvertError(t('err.emptyResponse'), 'fetch');
   return blob;
 }
 
@@ -75,7 +83,7 @@ function loadImageElement(blob, type) {
     img.onload = () => resolve({ img, revoke: () => URL.revokeObjectURL(url) });
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error('Bild konnte nicht dekodiert werden'));
+      reject(new Error(t('err.decode')));
     };
     img.src = url;
   });
@@ -88,13 +96,13 @@ async function decodeHeic(blob) {
   }
   const decoder = new libheif.HeifDecoder();
   const images = decoder.decode(new Uint8Array(await blob.arrayBuffer()));
-  if (!images?.length) throw new ConvertError('HEIC-Datei enthält kein Bild', 'decode');
+  if (!images?.length) throw new ConvertError(t('err.heicEmpty'), 'decode');
   const image = images[0];
   const width = image.get_width();
   const height = image.get_height();
   const imageData = new ImageData(width, height);
   await new Promise((resolve, reject) => {
-    image.display(imageData, (out) => (out ? resolve() : reject(new ConvertError('HEIC-Dekodierung fehlgeschlagen', 'decode'))));
+    image.display(imageData, (out) => (out ? resolve() : reject(new ConvertError(t('err.heicFailed'), 'decode'))));
   });
   for (const im of images) im.free?.();
   const bitmap = await createImageBitmap(imageData);
@@ -102,7 +110,7 @@ async function decodeHeic(blob) {
 }
 
 async function decode(blob, format, hint) {
-  if (format === 'html') throw new ConvertError('Server liefert eine Webseite statt eines Bildes (Hotlink-Schutz)', 'fetch');
+  if (format === 'html') throw new ConvertError(t('err.hotlink'), 'fetch');
 
   if (format === 'svg') {
     const { img, revoke } = await loadImageElement(blob, 'image/svg+xml');
@@ -128,14 +136,14 @@ async function decode(blob, format, hint) {
     try {
       return await decodeHeic(blob);
     } catch (e) {
-      if (format === 'heic') throw e instanceof ConvertError ? e : new ConvertError(`HEIC-Fehler: ${e.message}`, 'decode');
+      if (format === 'heic') throw e instanceof ConvertError ? e : new ConvertError(t('err.heic', { message: e.message }), 'decode');
     }
   }
   try {
     const { img, revoke } = await loadImageElement(blob);
     return { source: img, width: img.naturalWidth, height: img.naturalHeight, cleanup: revoke };
   } catch {
-    throw new ConvertError(`Format "${format}" kann nicht gelesen werden`, 'decode');
+    throw new ConvertError(t('err.format', { format }), 'decode');
   }
 }
 
@@ -204,7 +212,7 @@ async function crop({ url, rect, vw, options }) {
     const sy = Math.max(0, Math.round(rect.top * scale));
     const sw = Math.min(bitmap.width - sx, Math.round((rect.right - rect.left) * scale));
     const sh = Math.min(bitmap.height - sy, Math.round((rect.bottom - rect.top) * scale));
-    if (sw < 1 || sh < 1) throw new ConvertError('Ausschnitt ist leer', 'capture');
+    if (sw < 1 || sh < 1) throw new ConvertError(t('err.cropEmpty'), 'capture');
     const out = await encodeJpeg(bitmap, sw, sh, options, { sx, sy, sw, sh });
     return { ...out, format: 'screenshot', kept: false };
   } finally {
