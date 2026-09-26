@@ -53,8 +53,8 @@ button.primary:disabled { opacity: .45; cursor: default; }
   padding: 12px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border);
   box-shadow: 0 8px 24px rgba(0,0,0,.25); color: var(--text);
 }
-.menu label { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 8px; }
-.menu output { color: var(--accent); font-variant-numeric: tabular-nums; }
+.menu label { display: flex; justify-content: space-between; gap: 10px; font-weight: 600; margin-bottom: 8px; }
+.menu output { color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .menu input[type=range] { width: 100%; accent-color: var(--accent); margin: 0; }
 .menu .info { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
 .menu .scale { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin-top: 2px; }
