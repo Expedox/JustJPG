@@ -9,7 +9,7 @@ Dauer beim ersten Mal: etwa 30–45 Minuten plus Prüfzeit von Google.
 3. **Bestätigung in zwei Schritten** für das Google-Konto einschalten, sonst kann man nichts veröffentlichen.
 4. Im Reiter **Account**:
    - Publisher-Name eintragen (wird im Store angezeigt)
-   - Kontakt-E-Mail eintragen und bestätigen (Google schickt einen Link)
+   - Kontakt-E-Mail **justjpg.support@gmail.com** eintragen und bestätigen (Google schickt einen Link)
    - Angeben, ob du als **Händler (Trader)** handelst. Für ein kostenloses Hobby-Projekt ohne Einnahmen: „Non-trader“. In der EU ist diese Angabe Pflicht.
 
 ## 2. ZIP bauen
@@ -26,8 +26,8 @@ Das Skript prüft alles (Manifest, fehlende Dateien, Syntax, Übersetzungen) und
 
 Google verlangt eine öffentlich erreichbare Adresse.
 
-1. In `docs/privacy.html` beide Vorkommen von `CONTACT_EMAIL` durch die Kontakt-Adresse ersetzen.
-   Die Adresse ist danach öffentlich sichtbar, also am besten eine eigene Support-Adresse nehmen.
+1. Kontakt-Adresse in `docs/privacy.html`: **justjpg.support@gmail.com** (bereits eingetragen).
+   Dieselbe Adresse als Kontakt-E-Mail im Developer-Konto verwenden (Schritt 1).
 2. Veröffentlichen, eine der Möglichkeiten:
    - **GitHub Pages:** Repository → Settings → Pages → Branch `main`, Ordner `/docs` → speichern.
      Adresse: `https://<github-name>.github.io/<repo>/privacy.html`.
