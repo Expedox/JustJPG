@@ -60,6 +60,27 @@ Englisch ist Standard. In den Einstellungen oben rechts lassen sich außerdem De
 
 Fertig, die Sprache erscheint automatisch in der Auswahl. Fehlende Einträge fallen auf Englisch zurück, man kann also auch schrittweise übersetzen. Optional übersetzt `extension/_locales/<kürzel>/messages.json` die vier Texte, die Chrome selbst anzeigt (Beschreibung in der Erweiterungsliste, Symbol-Tooltip vor dem ersten Start, Namen der Tastenkürzel). Diese Texte folgen der Sprache des Browsers, nicht der Einstellung im Addon.
 
+## Build & Veröffentlichung
+
+```
+npm run build        # oder: node scripts/build.mjs  (Node.js 18+, keine Abhängigkeiten)
+```
+
+Das Skript prüft Manifest, referenzierte Dateien, Syntax und Übersetzungen und legt das Upload-Paket unter `dist/justjpg-<version>.zip` an. Die GitHub Action `.github/workflows/build.yml` macht dasselbe bei jedem Push; ein Tag wie `v1.0.1` erzeugt zusätzlich ein Release mit dem ZIP.
+
+Alles für den Chrome Web Store liegt in `store/`:
+
+| Datei | Inhalt |
+|---|---|
+| `store/CHECKLIST.md` | Schritt-für-Schritt-Anleitung zum Veröffentlichen und für Updates |
+| `store/LISTING.md` | Store-Texte (Englisch + Deutsch), Kategorie, welche Grafik wohin |
+| `store/PRIVACY-PRACTICES.md` | Single Purpose, Begründung jeder Berechtigung, Datenschutz-Angaben, Test-Anleitung für die Prüfer |
+| `store/screenshots/` | 5 Screenshots 1280×800 je Sprache |
+| `store/promo/` | Promo-Kacheln 440×280 und 1400×560 |
+| `docs/privacy.html` | Datenschutzerklärung (EN/DE) zum Veröffentlichen, z.B. per GitHub Pages |
+
+Lizenzhinweise zum mitgelieferten HEIC-Decoder stehen in `THIRD_PARTY_NOTICES.md`.
+
 ## Projektstruktur
 
 ```
@@ -75,4 +96,7 @@ extension/
   lib/defaults.js    Standardwerte + Dateinamen-Logik
   lib/libheif/       HEIC-Decoder (WebAssembly, LGPL-3.0)
   _locales/          Texte für Chromes eigene Seiten (optional pro Sprache)
+scripts/build.mjs    Prüfen + ZIP bauen
+store/               Store-Texte, Screenshots, Promo-Grafiken, Checkliste
+docs/privacy.html    Datenschutzerklärung
 ```

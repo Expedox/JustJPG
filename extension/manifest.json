@@ -31,7 +31,6 @@
     "storage",
     "scripting",
     "offscreen",
-    "activeTab",
     "declarativeNetRequestWithHostAccess"
   ],
   "host_permissions": [

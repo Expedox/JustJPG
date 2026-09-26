@@ -1,0 +1,12 @@
+{
+  "name": "justjpg",
+  "private": true,
+  "description": "Chrome extension: save any image as JPG with one click",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

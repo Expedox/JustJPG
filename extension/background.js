@@ -68,7 +68,7 @@ async function ensureOffscreen() {
   creatingOffscreen ??= chrome.offscreen
     .createDocument({
       url: 'offscreen.html',
-      reasons: ['BLOBS', 'DOM_PARSER'],
+      reasons: ['BLOBS'],
       justification: 'Decode images locally and convert them to JPG',
     })
     .catch((e) => {
