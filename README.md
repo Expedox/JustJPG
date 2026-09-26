@@ -39,7 +39,7 @@ HEIC wird mit [libheif](https://github.com/strukturag/libheif) (via [libheif-js]
 - **Speichern**: direkt oder „Speichern unter“-Dialog; Unterordner mit Platzhaltern (z.B. `JustJPG/{domain}`); bei vorhandener Datei nummerieren oder überschreiben.
 - **Qualität**: JPG-Qualität 50–100 % (Standard 92 %), Hintergrundfarbe für Transparenz (Standard Weiß), vorhandene JPGs 1:1 übernehmen, größte Version bevorzugen, Screenshot-Fallback.
 - **Dateiname**: 10 Vorlagen oder ein eigenes Muster mit den Platzhaltern `{name} {domain} {title} {alt} {date} {time} {year} {month} {day} {timestamp} {counter} {index} {width} {height} {format} {random}`. Kryptische Namen (Hashes, `image`, leer) werden automatisch durch ein Ersatzmuster ersetzt. Außerdem: Leerzeichen-Ersatz, Kleinschreibung, maximale Länge, Zähler zurücksetzen. Die Live-Vorschau zeigt das Ergebnis.
-- **Anzeige**: Bestätigung einblenden, Vorschau- und Mindestgröße in der Galerie. Die Vorschaugröße lässt sich auch direkt in der Galerie über „Vorschau ▾“ per Schieberegler ändern und wird gespeichert.
+- **Anzeige**: Bestätigung einblenden, Vorschau- und Mindestgröße in der Galerie. In der Galerie lassen sich Vorschaugröße („Vorschau ▾“) und Mindestgröße („Ab … px ▾“) direkt per Schieberegler ändern und werden gespeichert. Der Mindestgröße-Regler reicht nur so weit, wie es auf der Seite tatsächlich Bilder gibt.
 
 ## Grenzen
 

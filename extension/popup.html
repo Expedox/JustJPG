@@ -30,15 +30,18 @@
         <div class="scale"><span>klein</span><span>groß</span></div>
       </div>
     </div>
-    <label>Mindestgröße
-      <select id="min">
-        <option value="0">alle</option>
-        <option value="60">60 px</option>
-        <option value="150">150 px</option>
-        <option value="300">300 px</option>
-        <option value="600">600 px</option>
-      </select>
-    </label>
+    <div class="view">
+      <button id="minBtn" type="button" class="ghost" aria-haspopup="true" aria-expanded="false" aria-controls="minMenu" title="Kleine Bilder ausblenden">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>
+        Ab <span id="minLabel"></span> <span class="caret">&#9662;</span>
+      </button>
+      <div id="minMenu" class="menu" role="dialog" aria-label="Mindestgröße" hidden>
+        <label for="min">Mindestgröße <output id="minOut"></output></label>
+        <input type="range" id="min" min="0" max="1000" step="1">
+        <div class="scale"><span>0 px</span><span id="minMax"></span></div>
+        <p class="info" id="minInfo"></p>
+      </div>
+    </div>
     </div>
   </div>
 

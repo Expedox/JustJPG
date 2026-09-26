@@ -23,13 +23,37 @@
   };
 
   const settings = { ...DEFAULTS, ...(await chrome.storage.sync.get(DEFAULTS)) };
-  const minOptions = [...minSel.options].map((o) => +o.value);
-  const closest = minOptions.reduce((a, b) => (Math.abs(b - settings.galleryMinSize) < Math.abs(a - settings.galleryMinSize) ? b : a));
-  minSel.value = String(closest);
 
-  // ---------------------------------------------------------------- preview size dropdown
-  const viewBtn = $('viewBtn');
-  const viewMenu = $('viewMenu');
+  // ---------------------------------------------------------------- dropdowns
+  const menus = [
+    { btn: $('viewBtn'), menu: $('viewMenu'), focus: $('thumb') },
+    { btn: $('minBtn'), menu: $('minMenu'), focus: minSel },
+  ];
+  const setMenu = (entry, open) => {
+    entry.menu.hidden = !open;
+    entry.btn.setAttribute('aria-expanded', String(open));
+    if (open) entry.focus.focus();
+  };
+  for (const entry of menus) {
+    entry.btn.onclick = (e) => {
+      e.stopPropagation();
+      const open = entry.menu.hidden;
+      for (const other of menus) setMenu(other, false);
+      setMenu(entry, open);
+    };
+    entry.menu.onclick = (e) => e.stopPropagation();
+  }
+  document.addEventListener('click', () => menus.forEach((m) => setMenu(m, false)));
+  document.addEventListener('keydown', (e) => {
+    const open = menus.find((m) => !m.menu.hidden);
+    if (e.key === 'Escape' && open) {
+      e.preventDefault();
+      setMenu(open, false);
+      open.btn.focus();
+    }
+  });
+
+  // ---------------------------------------------------------------- preview size
   const thumb = $('thumb');
   const applyThumb = (px) => {
     grid.style.setProperty('--thumb', `${px}px`);
@@ -37,26 +61,37 @@
   };
   thumb.value = settings.galleryThumbSize;
   applyThumb(settings.galleryThumbSize);
-  const setMenu = (open) => {
-    viewMenu.hidden = !open;
-    viewBtn.setAttribute('aria-expanded', String(open));
-    if (open) thumb.focus();
-  };
-  viewBtn.onclick = (e) => {
-    e.stopPropagation();
-    setMenu(viewMenu.hidden);
-  };
-  viewMenu.onclick = (e) => e.stopPropagation();
-  document.addEventListener('click', () => setMenu(false));
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !viewMenu.hidden) {
-      e.preventDefault();
-      setMenu(false);
-      viewBtn.focus();
-    }
-  });
   thumb.oninput = () => applyThumb(+thumb.value);
   thumb.onchange = () => chrome.storage.sync.set({ galleryThumbSize: +thumb.value });
+
+  // ---------------------------------------------------------------- minimum size
+  // The slider only goes up to the largest size that still shows an image.
+  // It is quadratic, so the small values most pages need get most of the travel.
+  const STEPS = +minSel.max;
+  let minMax = 0; // largest useful minimum for the images found
+  let minWanted = settings.galleryMinSize; // what the user picked, may exceed minMax
+  const niceRound = (v) => (v < 100 ? Math.round(v) : v < 1000 ? Math.round(v / 5) * 5 : Math.round(v / 10) * 10);
+  const posToPx = (p) => (minMax ? Math.min(minMax, niceRound(minMax * (p / STEPS) ** 2)) : 0);
+  const pxToPos = (px) => (minMax ? Math.round(Math.sqrt(Math.min(1, px / minMax)) * STEPS) : 0);
+  const currentMin = () => Math.min(minWanted, minMax);
+
+  function sizeOf(item) {
+    return Math.min(item.w || item.desc.renderedWidth || 0, item.h || item.desc.renderedHeight || 0);
+  }
+
+  function updateMinRange() {
+    minMax = items.reduce((m, i) => Math.max(m, sizeOf(i)), 0);
+    minSel.disabled = !minMax;
+    minSel.value = pxToPos(currentMin());
+    $('minMax').textContent = `${minMax} px`;
+    $('minOut').textContent = $('minLabel').textContent = `${currentMin()} px`;
+  }
+
+  minSel.oninput = () => {
+    minWanted = posToPx(+minSel.value);
+    applyFilter();
+  };
+  minSel.onchange = () => chrome.storage.sync.set({ galleryMinSize: minWanted });
 
   function showEmpty(text) {
     empty.textContent = text;
@@ -159,14 +194,14 @@
   }
 
   function applyFilter() {
-    const min = +minSel.value;
+    updateMinRange();
+    const min = currentMin();
     for (const item of items) {
-      const w = item.w || item.desc.renderedWidth;
-      const h = item.h || item.desc.renderedHeight;
-      item.tile.hidden = w < min || h < min;
+      item.tile.hidden = sizeOf(item) < min;
       if (item.tile.hidden && selected.delete(item)) item.tile.classList.remove('selected');
     }
     const n = visibleItems().length;
+    $('minInfo').textContent = `${n} von ${items.length} Bildern sichtbar`;
     $('count').textContent = `${n} ${n === 1 ? 'Bild' : 'Bilder'}`;
     if (!n) {
       empty.textContent = items.length ? 'Keine Bilder in dieser Größe. Mindestgröße verkleinern.' : 'Keine Bilder auf dieser Seite gefunden.';
@@ -191,7 +226,6 @@
     }
     updateButton();
   };
-  minSel.onchange = applyFilter;
 
   let running = null;
   chrome.runtime.onMessage.addListener((msg) => {
