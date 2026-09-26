@@ -18,6 +18,18 @@
 
   <div class="toolbar">
     <label class="check"><input type="checkbox" id="all"> Alle</label>
+    <div class="right">
+    <div class="view">
+      <button id="viewBtn" type="button" class="ghost" aria-haspopup="true" aria-expanded="false" aria-controls="viewMenu" title="Vorschaugröße einstellen">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Vorschau <span class="caret">&#9662;</span>
+      </button>
+      <div id="viewMenu" class="menu" role="dialog" aria-label="Vorschaugröße" hidden>
+        <label for="thumb">Vorschaugröße <output id="thumbOut"></output></label>
+        <input type="range" id="thumb" min="70" max="260" step="10">
+        <div class="scale"><span>klein</span><span>groß</span></div>
+      </div>
+    </div>
     <label>Mindestgröße
       <select id="min">
         <option value="0">alle</option>
@@ -27,6 +39,7 @@
         <option value="600">600 px</option>
       </select>
     </label>
+    </div>
   </div>
 
   <main id="grid" aria-live="polite"></main>

@@ -27,6 +27,37 @@
   const closest = minOptions.reduce((a, b) => (Math.abs(b - settings.galleryMinSize) < Math.abs(a - settings.galleryMinSize) ? b : a));
   minSel.value = String(closest);
 
+  // ---------------------------------------------------------------- preview size dropdown
+  const viewBtn = $('viewBtn');
+  const viewMenu = $('viewMenu');
+  const thumb = $('thumb');
+  const applyThumb = (px) => {
+    grid.style.setProperty('--thumb', `${px}px`);
+    $('thumbOut').textContent = `${px} px`;
+  };
+  thumb.value = settings.galleryThumbSize;
+  applyThumb(settings.galleryThumbSize);
+  const setMenu = (open) => {
+    viewMenu.hidden = !open;
+    viewBtn.setAttribute('aria-expanded', String(open));
+    if (open) thumb.focus();
+  };
+  viewBtn.onclick = (e) => {
+    e.stopPropagation();
+    setMenu(viewMenu.hidden);
+  };
+  viewMenu.onclick = (e) => e.stopPropagation();
+  document.addEventListener('click', () => setMenu(false));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !viewMenu.hidden) {
+      e.preventDefault();
+      setMenu(false);
+      viewBtn.focus();
+    }
+  });
+  thumb.oninput = () => applyThumb(+thumb.value);
+  thumb.onchange = () => chrome.storage.sync.set({ galleryThumbSize: +thumb.value });
+
   function showEmpty(text) {
     empty.textContent = text;
     empty.hidden = false;

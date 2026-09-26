@@ -33,6 +33,7 @@
     // Feedback / gallery
     showToast: true,
     galleryMinSize: 60,
+    galleryThumbSize: 130,
   };
 
   const PRESETS = [
