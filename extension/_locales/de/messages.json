@@ -1,6 +1,6 @@
 {
   "extDescription": {
-    "message": "Speichert jedes Bild mit einem Klick als JPG. WEBP, AVIF, HEIC, PNG, SVG, Videos und Canvas werden lokal konvertiert."
+    "message": "Speichert jedes Bild mit einem Klick als JPG – auch moderne Formate und iPhone-Fotos. Umgewandelt lokal auf deinem Rechner."
   },
   "actionTitle": {
     "message": "JustJPG: Alle Bilder dieser Seite"
