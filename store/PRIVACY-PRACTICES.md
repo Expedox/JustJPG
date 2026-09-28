@@ -9,7 +9,7 @@ alle Texte hier passen. Unter jedem Block steht auf Deutsch, was er bedeutet.
 ## Single purpose description
 
 ```
-JustJPG saves images from web pages as JPG files. The user picks an image (right-click menu, a hover button, a keyboard shortcut or a gallery of the page's images); the extension fetches the best available version of that image, converts it locally to JPG (from WEBP, AVIF, HEIC, PNG, SVG, canvas or a video frame) and downloads it. Every feature serves this one purpose.
+JustJPG saves images from web pages as JPG files. The user picks an image (right-click menu, a hover button, a keyboard shortcut or a gallery of the page's images); the extension fetches the best available version of that image, converts it locally to JPG and downloads it. Every feature serves this one purpose.
 ```
 
 > Deutsch: Der eine Zweck des Addons ist „Bilder von Webseiten als JPG speichern“. Alle Funktionen dienen genau dem.
